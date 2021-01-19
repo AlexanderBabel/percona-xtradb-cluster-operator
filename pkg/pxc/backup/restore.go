@@ -331,6 +331,17 @@ func S3RestoreJob(cr *api.PerconaXtraDBClusterRestore, bcp *api.PerconaXtraDBClu
 										},
 									},
 								},
+								{
+									Name: "ENCRYPTION_KEY",
+									ValueFrom: &corev1.EnvVarSource{
+										SecretKeyRef: &corev1.SecretKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: bcp.Status.S3.CredentialsSecret,
+											},
+											Key: "ENCRYPTION_KEY",
+										},
+									},
+								},
 							},
 							Resources: resources,
 						},

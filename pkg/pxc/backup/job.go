@@ -190,6 +190,12 @@ func (Backup) SetStorageS3(job *batchv1.JobSpec, cr *api.PerconaXtraDBCluster, s
 			SecretKeyRef: app.SecretKeySelector(s3.CredentialsSecret, "AWS_SECRET_ACCESS_KEY"),
 		},
 	}
+	encryptionKey := corev1.EnvVar{
+		Name: "ENCRYPTION_KEY",
+		ValueFrom: &corev1.EnvVarSource{
+			SecretKeyRef: app.SecretKeySelector(s3.CredentialsSecret, "ENCRYPTION_KEY"),
+		},
+	}
 	region := corev1.EnvVar{
 		Name:  "DEFAULT_REGION",
 		Value: s3.Region,
@@ -202,7 +208,7 @@ func (Backup) SetStorageS3(job *batchv1.JobSpec, cr *api.PerconaXtraDBCluster, s
 	if len(job.Template.Spec.Containers) == 0 {
 		return errors.New("no containers in job spec")
 	}
-	job.Template.Spec.Containers[0].Env = append(job.Template.Spec.Containers[0].Env, accessKey, secretKey, region, endpoint)
+	job.Template.Spec.Containers[0].Env = append(job.Template.Spec.Containers[0].Env, accessKey, secretKey, encryptionKey, region, endpoint)
 
 	u, err := parseS3URL(destination)
 	if err != nil {
